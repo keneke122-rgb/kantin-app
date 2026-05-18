@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Kantin FEB UNNES</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Poppins', 'sans-serif'],
+                    },
+                    colors: {
+                        unnesBlue: '#0d47a1',
+                        unnesGold: '#ffd600',
+                        unnesDark: '#0a2e6e',
+                    },
+                    boxShadow: {
+                        'premium': '0 25px 40px -12px rgba(0,0,0,0.2), 0 0 0 1px rgba(13,71,161,0.1)',
+                        'gold-glow': '0 8px 25px -5px rgba(255,214,0,0.35)',
+                    },
+                    animation: {
+                        'float': 'float 4s ease-in-out infinite',
+                        'fade-up': 'fadeUp 0.8s ease-out',
+                    },
+                    keyframes: {
+                        float: { '0%,100%': { transform: 'translateY(0px)' }, '50%': { transform: 'translateY(-12px)' } },
+                        fadeUp: { '0%': { opacity: '0', transform: 'translateY(30px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } },
+                    },
+                },
+            },
+        }
+    </script>
+    
+    <style>
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.7s cubic-bezier(0.2, 0.9, 0.4, 1);
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .glass-nav {
+            background: rgba(13, 71, 161, 0.96);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 214, 0, 0.25);
+        }
+        .menu-card {
+            transition: all 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+        }
+        .menu-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 30px 40px -15px rgba(0,0,0,0.25), 0 0 0 2px #ffd600;
+        }
+        .gold-gradient {
+            background: linear-gradient(135deg, #ffd600 0%, #ffec66 50%, #ffd600 100%);
+        }
+        .blue-gradient {
+            background: linear-gradient(135deg, #0d47a1 0%, #1565c0 50%, #0d47a1 100%);
+        }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #0d47a1; }
+        ::-webkit-scrollbar-thumb { background: #ffd600; border-radius: 10px; }
+        .btn-gold {
+            background: linear-gradient(135deg, #ffd600 0%, #ffe44d 100%);
+            color: #0d47a1;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 214, 0, 0.25);
+        }
+        .btn-gold:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px -5px rgba(255, 214, 0, 0.4);
+        }
+        .btn-blue {
+            background: #0d47a1;
+            color: white;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .btn-blue:hover {
+            background: #1565c0;
+            box-shadow: 0 6px 15px rgba(13, 71, 161, 0.25);
+        }
+        .hero-overlay {
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.85) 0%, rgba(13, 71, 161, 0.75) 50%, rgba(0, 0, 0, 0.9) 100%);
+        }
+
+        /* SweetAlert2 Custom Theme */
+        .swal2-popup {
+            font-family: 'Poppins', sans-serif !important;
+            border-radius: 20px !important;
+        }
+        .swal2-title {
+            font-family: 'Poppins', sans-serif !important;
+            font-weight: 700 !important;
+            color: #0d47a1 !important;
+        }
+        .swal2-html-container {
+            font-family: 'Poppins', sans-serif !important;
+            color: #4b5563 !important;
+        }
+        .swal2-confirm {
+            background: linear-gradient(135deg, #ffd600 0%, #ffe44d 100%) !important;
+            color: #0d47a1 !important;
+            font-weight: 700 !important;
+            border-radius: 12px !important;
+            padding: 10px 28px !important;
+            font-family: 'Poppins', sans-serif !important;
+            box-shadow: 0 4px 15px rgba(255,214,0,0.35) !important;
+            border: none !important;
+        }
+        .swal2-cancel {
+            font-family: 'Poppins', sans-serif !important;
+            border-radius: 12px !important;
+            padding: 10px 28px !important;
+        }
+        .swal2-icon.swal2-success {
+            border-color: #ffd600 !important;
+            color: #0d47a1 !important;
+        }
+        .swal2-icon.swal2-success .swal2-success-ring {
+            border-color: rgba(255,214,0,0.3) !important;
+        }
+        .swal2-icon.swal2-success [class^=swal2-success-line] {
+            background-color: #0d47a1 !important;
+        }
+    </style>
+</head>
+<body class="font-sans bg-gradient-to-br from-blue-50 via-white to-amber-50 text-gray-800 overflow-x-hidden antialiased">
+
+    <header class="fixed top-0 left-0 w-full z-50 glass-nav shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex items-center justify-between">
+            <a href="#home" class="flex items-center gap-2 sm:gap-3 group">
+                <div class="w-9 h-9 sm:w-11 sm:h-11 rounded-xl gold-gradient flex items-center justify-center shadow-md transform group-hover:scale-105 transition duration-300">
+                    <i class="fas fa-utensils text-unnesBlue text-sm sm:text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-base sm:text-xl tracking-tight text-white"><span class="text-unnesGold">Kantin</span> FEB UNNES</h1>
+                    <p class="text-[8px] sm:text-[9px] font-semibold uppercase tracking-[0.15em] text-unnesGold/80">Premium Digital Canteen</p>
+                </div>
+            </a>
+            
+            <nav class="hidden md:flex items-center gap-6 lg:gap-8">
+                <a href="#home" class="text-white/90 hover:text-unnesGold font-medium text-sm transition duration-200 flex items-center gap-1"><i class="fas fa-home text-xs"></i> Home</a>
+                <a href="#menu" class="text-white/90 hover:text-unnesGold font-medium text-sm transition duration-200 flex items-center gap-1"><i class="fas fa-utensils text-xs"></i> Menu</a>
+                <a href="#keranjang" class="text-white/90 hover:text-unnesGold font-medium text-sm transition duration-200 flex items-center gap-1"><i class="fas fa-shopping-cart text-xs"></i> Keranjang</a>
+                <a href="#riwayat" class="text-white/90 hover:text-unnesGold font-medium text-sm transition duration-200 flex items-center gap-1"><i class="fas fa-history text-xs"></i> Riwayat</a>
+                <a href="#kontak" class="text-white/90 hover:text-unnesGold font-medium text-sm transition duration-200 flex items-center gap-1"><i class="fas fa-phone-alt text-xs"></i> Kontak</a>
+            </nav>
+            
+            <div class="hidden md:block">
+                <a href="#riwayat" class="btn-gold text-xs sm:text-sm px-5 py-2 rounded-full shadow-md inline-flex items-center gap-2">
+                    <i class="fas fa-receipt text-xs"></i> Lihat Transaksi
+                </a>
+            </div>
+            
+            <button id="menu-btn" class="md:hidden text-white text-xl p-2 rounded-lg hover:bg-white/10 transition active:scale-95 focus:outline-none" aria-label="Toggle Menu">
+                <i class="fas fa-bars-staggered"></i>
+            </button>
+        </div>
+        
+        <div id="mobile-menu" class="hidden md:hidden bg-unnesBlue/98 backdrop-blur-xl border-t border-unnesGold/20 px-4 py-4 space-y-2 shadow-2xl transition-all duration-300">
+            <a href="#home" class="mobile-nav-link block text-white font-medium p-2.5 rounded-xl hover:bg-white/5"><i class="fas fa-home mr-3 text-unnesGold w-5"></i>Home</a>
+            <a href="#menu" class="mobile-nav-link block text-white/90 p-2.5 rounded-xl hover:bg-white/5"><i class="fas fa-utensils mr-3 text-unnesGold w-5"></i>Menu</a>
+            <a href="#keranjang" class="mobile-nav-link block text-white/90 p-2.5 rounded-xl hover:bg-white/5"><i class="fas fa-shopping-cart mr-3 text-unnesGold w-5"></i>Keranjang</a>
+            <a href="#riwayat" class="mobile-nav-link block text-white/90 p-2.5 rounded-xl hover:bg-white/5"><i class="fas fa-history mr-3 text-unnesGold w-5"></i>Riwayat</a>
+            <a href="#kontak" class="mobile-nav-link block text-white/90 p-2.5 rounded-xl hover:bg-white/5"><i class="fas fa-phone-alt mr-3 text-unnesGold w-5"></i>Kontak</a>
+        </div>
+    </header>
+
+
+    <section id="home" class="relative min-h-screen flex items-center justify-center overflow-hidden pt-16">
+        <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1555396273-367ea4eb4db5?q=80&w=1974&auto=format')] bg-cover bg-center bg-no-repeat scale-100 md:scale-105"></div>
+        <div class="absolute inset-0 hero-overlay"></div>
+        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/40"></div>
+        
+        <div class="relative z-10 text-center max-w-4xl px-4 sm:px-6 animate-fade-up">
+            <div class="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md border border-unnesGold/40 rounded-full px-4 py-1.5 mb-5 sm:mb-6 shadow-lg">
+                <span class="w-2 h-2 rounded-full bg-unnesGold animate-pulse"></span>
+                <span class="text-unnesGold text-[10px] sm:text-xs font-bold tracking-widest uppercase">KANTIN DIGITAL FEB UNNES</span>
+            </div>
+            <h1 class="font-bold text-3xl sm:text-5xl md:text-7xl text-white leading-tight drop-shadow-xl">
+                Nikmati <span class="text-unnesGold">Kuliner</span><br class="hidden sm:inline"> Tanpa Antre
+            </h1>
+            <p class="text-sm sm:text-base md:text-lg text-gray-200 max-w-xl mx-auto mt-4 sm:mt-6 mb-8 sm:mb-10 font-light leading-relaxed">
+                Platform resmi pemesanan makanan & minuman Fakultas Ekonomika dan Bisnis UNNES. Cepat, praktis, dan penuh gaya!
+            </p>
+            <a href="#menu" class="inline-flex items-center gap-2.5 btn-gold font-bold px-6 sm:px-8 py-3.5 sm:py-4 rounded-full shadow-xl transition-all duration-300 text-unnesBlue text-sm sm:text-base">
+                <span>Jelajahi Menu Premium</span>
+                <i class="fas fa-arrow-right text-xs"></i>
+            </a>
+        </div>
+        <div class="absolute bottom-6 left-1/2 -translate-x-1/2 animate-bounce cursor-pointer hidden sm:block">
+            <i class="fas fa-chevron-down text-unnesGold text-xlsm"></i>
+        </div>
+    </section>
+
+  
+    <section id="menu" class="py-16 sm:py-24 md:py-28 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto reveal">
+        <div class="text-center mb-10 sm:mb-16">
+            <span class="bg-unnesBlue/10 text-unnesBlue font-bold tracking-[0.15em] text-[10px] sm:text-xs uppercase px-4 py-1.5 rounded-full border border-unnesGold/40">Signature Menu</span>
+            <h2 class="font-bold text-2xl sm:text-4xl md:text-5xl text-unnesBlue mt-3">🔥 Menu <span class="text-unnesGold">Terfavorit</span></h2>
+            <div class="w-16 sm:w-20 h-1 bg-unnesGold mx-auto mt-4 rounded-full"></div>
+            <p class="text-gray-600 max-w-xl mx-auto mt-3 text-xs sm:text-sm md:text-base font-medium">Hidangan pilihan mahasiswa, rasa juara, harga ramah di kantong</p>
+        </div>
+        <!-- FIX: ID harus "menu-container" sesuai JS, dan grid class di sini -->
+        <div id="menu-container" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8"></div>
+    </section>
+
+
+    <section id="keranjang" class="py-12 sm:py-16 px-4 sm:px-6 max-w-4xl mx-auto reveal">
+        <div class="bg-white rounded-2xl sm:rounded-3xl shadow-xl border border-unnesGold/20 p-4 sm:p-6 md:p-8">
+            <h3 class="font-bold text-xl sm:text-2xl text-unnesBlue mb-4 flex items-center justify-between">
+                <span class="flex items-center gap-2">
+                    <i class="fas fa-shopping-cart text-unnesGold"></i> Keranjang Belanja
+                </span>
+                <span id="cart-count" class="text-xs sm:text-sm bg-unnesGold text-unnesBlue px-3 py-1 rounded-full font-bold shadow-sm">0</span>
+            </h3>
+            
+            <div id="cart-items" class="space-y-3 max-h-80 sm:max-h-96 overflow-y-auto pr-1">
+                <div class="text-center text-gray-400 py-10 text-sm">Keranjang masih kosong, pilih menu dulu bro!</div>
+            </div>
+            
+            <div class="border-t border-gray-100 mt-6 pt-4 sm:pt-6">
+                <div class="flex justify-between items-center mb-6">
+                    <span class="font-bold text-base sm:text-lg text-unnesBlue">Total Pembayaran:</span>
+                    <span id="cart-total" class="font-bold text-xl sm:text-2xl text-orange-500">Rp 0</span>
+                </div>
+                
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-unnesBlue text-xs sm:text-sm font-semibold mb-1.5"><i class="fas fa-user mr-1.5 text-unnesGold"></i> Nama Pemesan</label>
+                        <input type="text" id="checkout-nama" placeholder="Nama lengkap mahasiswa" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 sm:py-3 text-sm focus:border-unnesGold focus:ring-2 focus:ring-unnesGold/20 transition duration-200" required>
+                    </div>
+                    <div>
+                        <label class="block text-unnesBlue text-xs sm:text-sm font-semibold mb-1.5"><i class="fas fa-comment-dots mr-1.5 text-unnesGold"></i> Catatan Khusus (Opsional)</label>
+                        <input type="text" id="checkout-catatan" placeholder="Contoh: Pedas, sendok plastik, kuah dipisah" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 sm:py-3 text-sm focus:border-unnesGold focus:ring-2 focus:ring-unnesGold/20 transition duration-200">
+                    </div>
+                    <button id="checkout-btn" class="w-full btn-gold font-bold py-3.5 rounded-xl transition-all duration-300 flex items-center justify-center gap-2 text-unnesBlue text-sm sm:text-base">
+                        <i class="fab fa-whatsapp text-lg sm:text-xl"></i> Checkout via WhatsApp
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="riwayat" class="py-16 sm:py-24 md:py-28 px-4 sm:px-6 max-w-6xl mx-auto reveal">
+        <div class="text-center mb-8 sm:mb-12">
+            <span class="bg-unnesBlue/10 text-unnesBlue px-4 py-1.5 rounded-full text-[10px] sm:text-xs font-bold tracking-wider border border-unnesGold/30">Live Database</span>
+            <h2 class="font-bold text-2xl sm:text-4xl text-unnesBlue mt-3"><i class="fas fa-history mr-1.5 text-unnesGold"></i> Riwayat Transaksi</h2>
+        </div>
+        
+        <div class="bg-white rounded-2xl sm:rounded-3xl shadow-xl border border-unnesGold/15 p-3 sm:p-6 md:p-8">
+            <div class="overflow-x-auto w-full rounded-xl">
+                <table class="w-full min-w-[520px] md:min-w-[650px] border-collapse layout-fixed">
+                    <thead>
+                        <tr class="border-b border-unnesGold/20 text-unnesBlue text-[11px] sm:text-xs font-bold uppercase tracking-wider bg-slate-50">
+                            <th class="hidden md:table-cell py-3.5 px-3 text-left font-semibold w-[25%]">Tanggal</th>
+                            <th class="py-3.5 px-3 text-left font-semibold w-[30%] md:w-[20%]">Nama</th>
+                            <th class="py-3.5 px-3 text-left font-semibold w-[40%] md:w-[30%]">Menu</th>
+                            <th class="py-3.5 px-3 text-center font-semibold w-[12%] md:w-[10%]">Jumlah</th>
+                            <th class="py-3.5 px-3 text-right font-semibold w-[18%] md:w-[15%]">Total</th>
+                         </tr>
+                    </thead>
+                    <tbody id="riwayat-table-body" class="text-xs sm:text-sm divide-y divide-slate-100"></tbody>
+                 </table>
+            </div>
+            <div id="riwayat-empty" class="hidden text-center py-10 sm:py-14">
+                <i class="fas fa-receipt text-5xl text-unnesGold/30 mb-3"></i>
+                <p class="text-gray-400 text-xs sm:text-sm font-medium">Belum ada catatan riwayat transaksi terpusat.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="kontak" class="py-12 sm:py-20 md:py-28 px-4 sm:px-6 max-w-6xl mx-auto reveal">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white rounded-2xl sm:rounded-3xl shadow-premium border border-unnesGold/15 overflow-hidden">
+            
+            <div class="blue-gradient p-6 sm:p-10 text-white relative overflow-hidden flex flex-col justify-between">
+                <div class="absolute -right-20 -top-20 w-64 h-64 bg-unnesGold/10 rounded-full blur-3xl"></div>
+                <div class="relative z-10">
+                    <i class="fas fa-building text-3xl sm:text-4xl text-unnesGold mb-4 sm:mb-6"></i>
+                    <h3 class="font-bold text-xl sm:text-2xl text-unnesGold mb-2 sm:mb-3">Hubungi Kami</h3>
+                    <p class="text-xs sm:text-sm text-blue-100 font-light">Layanan Customer Service siap melayani mahasiswa & dosen FEB.</p>
+                    
+                    <div class="mt-8 space-y-4 text-xs sm:text-sm">
+                        <div class="flex items-start gap-3">
+                            <i class="fas fa-map-marker-alt text-unnesGold mt-0.5 w-4 text-center"></i>
+                            <span class="font-light">Gedung L FEB UNNES, Kampus Sekaran, Gunungpati, Semarang</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <a href="https://wa.me/+62882005293513" target="_blank">
+                                <i class="fab fa-whatsapp text-unnesGold text-base w-4 text-center"></i>
+                            <span class="font-medium">+62 882-0052-93513</span>
+                            </a>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-clock text-unnesGold w-4 text-center"></i>
+                            <span class="font-light">Senin - Jumat, 07.00 - 16.00 WIB</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-8 md:mt-0 text-[10px] text-blue-200/60 font-light">
+                    *Pesanan di luar jam kerja akan diproses esok hari.
+                </div>
+            </div>
+            
+            <form class="p-6 sm:p-8 space-y-4 sm:space-y-5" id="saran-form">
+                <div>
+                    <h4 class="font-bold text-xl sm:text-2xl text-unnesBlue"><i class="fas fa-comment-dots mr-1.5 text-unnesGold"></i> Kritik & Saran</h4>
+                    <p class="text-xs text-gray-400 mt-1">Saran Anda sangat berharga untuk meningkatkan kualitas layanan kantin.</p>
+                </div>
+                <div>
+                    <input type="text" id="saran-nama" placeholder="Nama Lengkap Anda" class="w-full border border-gray-200 rounded-xl p-3 text-sm focus:border-unnesGold focus:ring-2 focus:ring-unnesGold/20 transition" required>
+                </div>
+                <div>
+                    <textarea id="saran-pesan" rows="4" placeholder="Tulis kritik konstruktif atau saran menu baru di sini..." class="w-full border border-gray-200 rounded-xl p-3 text-sm focus:border-unnesGold focus:ring-2 focus:ring-unnesGold/20 transition" required></textarea>
+                </div>
+                <button type="submit" class="w-full btn-gold text-unnesBlue font-bold py-3 rounded-xl transition-all duration-300 text-sm sm:text-base flex items-center justify-center gap-2">
+                    <i class="fab fa-whatsapp"></i> Kirim Saran via WA
+                </button>
+            </form>
+        </div>
+    </section>
+
+    <footer class="bg-gradient-to-b from-unnesDark to-slate-950 text-white/70 pt-16 pb-8 border-t-4 border-unnesGold relative overflow-hidden">
+        <div class="absolute -left-10 bottom-0 w-72 h-72 bg-unnesBlue/10 rounded-full blur-3xl pointer-events-none"></div>
+        
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-10 md:gap-8 pb-12 border-b border-white/10">
+                
+                <div class="md:col-span-5 space-y-4">
+                    <a href="#home" class="flex items-center gap-3 group inline-block">
+                        <div class="w-10 h-10 rounded-xl gold-gradient flex items-center justify-center shadow-lg transform group-hover:scale-105 transition duration-300">
+                            <i class="fas fa-utensils text-unnesBlue text-lg"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-lg tracking-tight text-white"><span class="text-unnesGold">Kantin</span> FEB UNNES</h3>
+                            <p class="text-[9px] font-semibold uppercase tracking-[0.15em] text-unnesGold/80">Premium Digital Canteen</p>
+                        </div>
+                    </a>
+                    <p class="text-xs sm:text-sm text-gray-400 font-light leading-relaxed max-w-sm">
+                        Layanan integrasi digital modern untuk mempermudah civitas akademika Fakultas Ekonomika dan Bisnis UNNES menikmati kuliner terbaik tanpa perlu antre lama.
+                    </p>
+                    <div class="flex items-center gap-3 pt-2">
+                        <a href="https://wa.me/+62882005293513" target="_blank" class="w-8 h-8 rounded-lg bg-white/5 hover:bg-emerald-500 hover:text-white flex items-center justify-center text-sm text-white transition duration-300"><i class="fab fa-whatsapp"></i></a>
+                    </div>
+                </div>
+
+                <div class="md:col-span-3 space-y-4 md:pl-8">
+                    <h4 class="text-sm font-bold uppercase tracking-wider text-white border-l-2 border-unnesGold pl-2">Link Cepat</h4>
+                    <ul class="space-y-2.5 text-xs sm:text-sm">
+                        <li><a href="#home" class="hover:text-unnesGold transition duration-200 flex items-center gap-2 text-gray-400"><i class="fas fa-chevron-right text-[10px] text-unnesGold/50"></i> Beranda</a></li>
+                        <li><a href="#menu" class="hover:text-unnesGold transition duration-200 flex items-center gap-2 text-gray-400"><i class="fas fa-chevron-right text-[10px] text-unnesGold/50"></i> Menu Favorit</a></li>
+                        <li><a href="#keranjang" class="hover:text-unnesGold transition duration-200 flex items-center gap-2 text-gray-400"><i class="fas fa-chevron-right text-[10px] text-unnesGold/50"></i> Keranjang Belanja</a></li>
+                        <li><a href="#riwayat" class="hover:text-unnesGold transition duration-200 flex items-center gap-2 text-gray-400"><i class="fas fa-chevron-right text-[10px] text-unnesGold/50"></i> Riwayat Transaksi</a></li>
+                    </ul>
+                </div>
+
+                <div class="md:col-span-4 space-y-4">
+                    <h4 class="text-sm font-bold uppercase tracking-wider text-white border-l-2 border-unnesGold pl-2">Jam Layanan</h4>
+                    <div class="space-y-3 text-xs sm:text-sm text-gray-400">
+                        <div class="flex items-start gap-3 bg-white/5 p-3 rounded-xl border border-white/5">
+                            <i class="fas fa-clock text-unnesGold mt-0.5"></i>
+                            <div>
+                                <p class="font-medium text-white text-xs">Senin - Jumat</p>
+                                <p class="text-xs text-gray-400 font-light mt-0.5">07:00 WIB - 16:00 WIB</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-3 p-1">
+                            <i class="fas fa-calendar-times text-rose-400 mt-0.5"></i>
+                            <div>
+                                <p class="font-medium text-gray-300 text-xs">Sabtu, Minggu & Hari Besar</p>
+                                <p class="text-xs text-gray-500 font-light mt-0.5">Layanan Libur (Tutup)</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="pt-8 flex flex-col sm:flex-row items-center justify-between text-center sm:text-left gap-4 text-xs">
+                <p class="font-medium text-gray-400">
+                    &copy; 2026 <span class="text-white">Kantin FEB UNNES</span> — All Rights Reserved.
+                </p>
+                <p class="text-gray-400 font-light flex items-center gap-1">
+                    Crafted with <i class="fas fa-heart text-rose-500 animate-pulse mx-0.5"></i> by <span class="text-unnesGold font-medium">Achmad Shofi Zakaria</span>
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="main.js"></script>
+    <script>
+        document.querySelectorAll('.mobile-nav-link').forEach(link => {
+            link.addEventListener('click', () => {
+                document.getElementById('mobile-menu').classList.add('hidden');
+            });
+        });
+    </script>
+</body>
+</html>
