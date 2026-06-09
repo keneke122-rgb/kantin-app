@@ -2,6 +2,105 @@
 const API_URL =
   "https://script.google.com/macros/s/AKfycbypOUrgKJo2r9ErW3RGJV4irDNpTCHmbQK9VsgEuu30C3274hFvUYKs397IW8zkH2bWeQ/exec";
 
+const PRODUCTS_DB = [
+  {
+    nama: "Corndog Mozzarella",
+    harga: 8000,
+    gambar: "condordmozza8rb.jpeg",
+    deskripsi: "Corndog renyah dengan isian keju mozzarella lumer yang molor banget!",
+    stok: 15,
+    kategori: "makanan"
+  },
+  {
+    nama: "Es Teh",
+    harga: 4000,
+    gambar: "esteh4k.jpeg",
+    deskripsi: "Es teh manis segar, pelepas dahaga paling pas saat cuaca panas.",
+    stok: 50,
+    kategori: "minuman"
+  },
+  {
+    nama: "Jus Mangga",
+    harga: 8000,
+    gambar: "jusmannga8rb.jpeg",
+    deskripsi: "Jus buah mangga segar asli yang manis, kental, dan dingin menyegarkan.",
+    stok: 20,
+    kategori: "minuman"
+  },
+  {
+    nama: "Jus Melon",
+    harga: 8000,
+    gambar: "jusmelon8rb.jpeg",
+    deskripsi: "Jus buah melon pilihan yang manis, menyegarkan, dan kaya vitamin.",
+    stok: 15,
+    kategori: "minuman"
+  },
+  {
+    nama: "Jus Nanas",
+    harga: 7000,
+    gambar: "jusnanas7rb.jpeg",
+    deskripsi: "Jus buah nanas segar dengan perpaduan rasa asam-manis yang khas.",
+    stok: 15,
+    kategori: "minuman"
+  },
+  {
+    nama: "Katsu Kari",
+    harga: 14000,
+    gambar: "katsukari14ribu.jpeg",
+    deskripsi: "Chicken katsu renyah dengan siraman saus kari Jepang gurih di atas nasi hangat.",
+    stok: 20,
+    kategori: "makanan"
+  },
+  {
+    nama: "Mie Ayam",
+    harga: 14000,
+    gambar: "mie ayam 14rb.jpeg",
+    deskripsi: "Mie ayam lezat dengan topping ayam bumbu manis gurih, pangsit, dan kuah kaldu hangat.",
+    stok: 25,
+    kategori: "makanan"
+  },
+  {
+    nama: "Nasi Goreng Telur",
+    harga: 14000,
+    gambar: "nasgortelur14rb.jpeg",
+    deskripsi: "Nasi goreng khas dengan bumbu pilihan, disajikan dengan telur dadar/mata sapi hangat.",
+    stok: 25,
+    kategori: "makanan"
+  },
+  {
+    nama: "Paket Dimsum Komplit",
+    harga: 16000,
+    gambar: "paketdimsumskomplit16rb.jpeg",
+    deskripsi: "Paket dimsum isi campur (ayam, udang, beef) yang lembut, gurih, lengkap dengan saus sambal.",
+    stok: 12,
+    kategori: "makanan"
+  },
+  {
+    nama: "Rice Bowl Teriyaki",
+    harga: 13000,
+    gambar: "ricebowlteriyaki 13rb.jpeg",
+    deskripsi: "Nasi hangat dengan potongan ayam saus teriyaki gurih manis bertabur wijen.",
+    stok: 20,
+    kategori: "makanan"
+  }
+];
+
+var kategoriAktif = "semua";
+
+window.filterKategori = function (kategori, btnEl) {
+  kategoriAktif = kategori;
+
+  var btns = document.querySelectorAll("#tab-filter-container button");
+  btns.forEach(function (btn) {
+    btn.className =
+      "px-6 py-2.5 bg-white text-slate-600 hover:text-unnesBlue font-semibold text-sm rounded-full shadow-sm border border-slate-100 transition duration-300 flex items-center gap-2";
+  });
+
+  btnEl.className =
+    "px-6 py-2.5 bg-unnesBlue text-white font-bold text-sm rounded-full shadow-md transition duration-300 flex items-center gap-2 active-tab";
+
+  muatMenuDariSpreadsheet();
+};
 
 const Toast = Swal.mixin({
   toast: true,
@@ -91,7 +190,7 @@ function fetchJsonp(url, params) {
 var cart = [];
 
 function loadCart() {
-  var savedCart = localStorage.getItem("kantinCart");
+  var savedCart = localStorage.getItem("klikFoodCart");
   if (savedCart) {
     try {
       cart = JSON.parse(savedCart);
@@ -103,7 +202,7 @@ function loadCart() {
 }
 
 function saveCart() {
-  localStorage.setItem("kantinCart", JSON.stringify(cart));
+  localStorage.setItem("klikFoodCart", JSON.stringify(cart));
   renderCart();
 }
 
@@ -222,6 +321,48 @@ function renderCart() {
 }
 
 
+var countdownTimerInterval = null;
+
+window.kembaliKeToko = function () {
+  if (countdownTimerInterval) clearInterval(countdownTimerInterval);
+  var modal = document.getElementById("invoice-payment-modal");
+  if (modal) modal.classList.add("hidden");
+  document.body.classList.remove("overflow-hidden");
+};
+
+function startCountdown(durationSeconds) {
+  if (countdownTimerInterval) clearInterval(countdownTimerInterval);
+
+  var timerDisplay = document.getElementById("payment-timer");
+  var timeRemaining = durationSeconds;
+
+  function tick() {
+    var minutes = Math.floor(timeRemaining / 60);
+    var seconds = timeRemaining % 60;
+
+    minutes = minutes < 10 ? "0" + minutes : minutes;
+    seconds = seconds < 10 ? "0" + seconds : seconds;
+
+    if (timerDisplay) timerDisplay.innerText = minutes + ":" + seconds;
+
+    if (timeRemaining <= 0) {
+      clearInterval(countdownTimerInterval);
+      Swal.fire({
+        icon: "warning",
+        title: "Waktu Pembayaran Habis!",
+        text: "Batas waktu pembayaran 5 menit telah terlewati. Silakan lakukan order ulang.",
+        confirmButtonColor: "#0d47a1"
+      }).then(function () {
+        kembaliKeToko();
+      });
+    }
+    timeRemaining--;
+  }
+
+  tick();
+  countdownTimerInterval = setInterval(tick, 1000);
+}
+
 async function checkout() {
   if (cart.length === 0) {
     await swalWarning(
@@ -241,233 +382,216 @@ async function checkout() {
     return;
   }
 
-  var checkoutBtn = document.getElementById("checkout-btn");
-  if (checkoutBtn) {
-    checkoutBtn.disabled = true;
-    checkoutBtn.innerHTML =
-      '<i class="fa-solid fa-circle-notch fa-spin"></i> Memproses...';
-  }
+  // Restore checkout view state in case it was closed previously
+  document.getElementById("payment-modal-checkout-view").classList.remove("hidden");
+  document.getElementById("payment-modal-success-view").classList.add("hidden");
 
-  Swal.fire({
-    title: "Memproses Pesanan...",
-    html: "Mohon tunggu, pesananmu sedang dicatat ke database \uD83D\uDCCB",
-    allowOutsideClick: false,
-    allowEscapeKey: false,
-    didOpen: function () {
-      Swal.showLoading();
-    },
+  // Generate Invoice ID
+  var invoiceId = "KFF-" + Date.now().toString().slice(-8);
+
+  // Injeksi Data ke Modal Invoice
+  document.getElementById("payment-invoice-id").innerText = invoiceId;
+  document.getElementById("invoice-penerima").innerText = nama;
+  document.getElementById("invoice-catatan").innerText = 
+    document.getElementById("checkout-catatan").value.trim() || "Tidak ada";
+
+  // Hitung & Injeksi Detail Table
+  var total = 0;
+  var tbody = document.getElementById("invoice-items-body");
+  tbody.innerHTML = "";
+
+  cart.forEach(function (item) {
+    var itemSubtotal = item.harga * item.jumlah;
+    total += itemSubtotal;
+
+    var tr = document.createElement("tr");
+    tr.className = "border-b border-slate-100 hover:bg-slate-50/50 transition-colors";
+    tr.innerHTML = `
+        <td class="py-2.5 px-3">
+            <span class="font-bold text-slate-800 text-xs sm:text-sm">${escapeHTML(item.menu)}</span>
+        </td>
+        <td class="py-2.5 px-3 text-center text-slate-800 text-xs sm:text-sm">${item.jumlah}</td>
+        <td class="py-2.5 px-3 text-right font-bold text-slate-800 text-xs sm:text-sm">Rp ${itemSubtotal.toLocaleString("id-ID")}</td>
+    `;
+    tbody.appendChild(tr);
   });
 
-  try {
-    var total = 0,
-      detailPesanan = "",
-      allOrders = [];
-    var catatan =
-      document.getElementById("checkout-catatan").value.trim() || "Tidak ada";
+  document.getElementById("invoice-total").innerText = "Rp " + total.toLocaleString("id-ID");
 
-    cart.forEach(function (item, index) {
-      var subtotal = item.harga * item.jumlah;
-      total += subtotal;
-      detailPesanan +=
-        index +
-        1 +
-        ". " +
-        item.menu +
-        " x" +
-        item.jumlah +
-        " = Rp " +
-        subtotal.toLocaleString("id-ID") +
-        "\n";
-      allOrders.push({
-        nama: nama,
-        menu: item.menu,
-        jumlah: item.jumlah,
-        total: subtotal,
-        catatan: catatan,
-      });
+  // Reset Button & Spinner
+  var spinner = document.getElementById("btn-status-spinner");
+  if (spinner) spinner.className = "fab fa-whatsapp text-lg";
+  document.getElementById("btn-status-text").innerText = "Kirim Bukti Pembayaran ke WhatsApp";
+
+  // Start Countdown Timer (300 seconds = 5 minutes)
+  startCountdown(300);
+
+  // Show Modal Overlay
+  var modal = document.getElementById("invoice-payment-modal");
+  if (modal) modal.classList.remove("hidden");
+  document.body.classList.add("overflow-hidden");
+}
+
+async function kirimKonfirmasiWhatsApp() {
+  if (countdownTimerInterval) clearInterval(countdownTimerInterval);
+
+  var invoiceId = document.getElementById("payment-invoice-id").innerText;
+  var nama = document.getElementById("invoice-penerima").innerText;
+  var catatan = document.getElementById("invoice-catatan").innerText;
+
+  // Tutup modal segera!
+  kembaliKeToko();
+
+  var total = 0,
+    detailPesanan = "",
+    allOrders = [];
+
+  cart.forEach(function (item, index) {
+    var subtotal = item.harga * item.jumlah;
+    total += subtotal;
+    detailPesanan +=
+      (index + 1) +
+      ". " +
+      item.menu +
+      " x" +
+      item.jumlah +
+      " = Rp " +
+      subtotal.toLocaleString("id-ID") +
+      "\n";
+    allOrders.push({
+      nama: nama,
+      menu: item.menu,
+      jumlah: item.jumlah,
+      total: subtotal,
+      catatan: catatan,
     });
+  });
 
+  var waMsg = 'Halo Admin Klik Food FEB! 🍽️✨\n\n' +
+          '*KONFIRMASI PEMBAYARAN QRIS*\n' +
+          '🧾 *Invoice ID:* ' + invoiceId + '\n' +
+          '👤 *Nama Pemesan:* ' + nama + '\n\n' +
+          '*Detail Pesanan:*\n' + detailPesanan + '\n' +
+          '━━━━━━━━━━━━━━━━\n' +
+          '💰 *TOTAL: Rp ' + total.toLocaleString("id-ID") + '*\n\n' +
+          '📝 *Catatan:* ' + catatan + '\n\n' +
+          'Berikut saya lampirkan bukti transfer pembayaran QRIS. Mohon segera diproses ya, terima kasih! 🙏';
+          
+  var waUrl = "https://api.whatsapp.com/send?phone=62882005293513&text=" + encodeURIComponent(waMsg);
 
+  // Buka WhatsApp segera (harus dipicu langsung di event click agar tidak diblokir browser!)
+  window.open(waUrl, "_blank");
+
+  // Reset keranjang belanja & form input
+  cart = [];
+  saveCart();
+  document.getElementById("checkout-nama").value = "";
+  document.getElementById("checkout-catatan").value = "";
+
+  // Simpan data transaksi ke Google Sheets di background
+  try {
     for (var i = 0; i < allOrders.length; i++) {
-      await fetch(API_URL, {
+      fetch(API_URL, {
         method: "POST",
         mode: "no-cors",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(allOrders[i]),
+      }).then(function() {
+        muatRiwayatTransaksi();
       });
     }
-
-    await new Promise(function (resolve) {
-      setTimeout(resolve, 1500);
-    });
-    await muatRiwayatTransaksi();
-
-    Swal.close();
-
-    var waMsg = 'Halo Admin Kantin FEB! 🍽️✨\n\n' +
-            '*PESANAN BARU*\n' +
-            '👤 *Nama:* ' + nama + '\n\n' +
-            '*Detail Pesanan:*\n' + detailPesanan + '\n' +
-            '━━━━━━━━━━━━━━━━\n' +
-            '💰 *TOTAL: Rp ' + total.toLocaleString("id-ID") + '*\n\n' +
-            '📝 *Catatan:* ' + catatan + '\n\n' +
-            'Mohon segera diproses ya, terima kasih! 🙏';
-            
-var waUrl = "https://api.whatsapp.com/send?phone=62882005293513&text=" + encodeURIComponent(waMsg);
-
-    cart = [];
-    saveCart();
-    document.getElementById("checkout-nama").value = "";
-    document.getElementById("checkout-catatan").value = "";
-
-    await Swal.fire({
-      icon: "success",
-      title: "\uD83C\uDF89 Pesanan Berhasil Dicatat!",
-      html:
-        '<div style="text-align:center;">' +
-        '<p style="color:#4b5563;margin-bottom:8px;">Total pembayaran kamu:</p>' +
-        '<p style="font-size:1.5rem;font-weight:800;color:#f97316;">Rp ' +
-        total.toLocaleString("id-ID") +
-        "</p>" +
-        '<p style="color:#6b7280;font-size:0.85rem;margin-top:10px;">Klik tombol di bawah untuk konfirmasi ke WhatsApp Admin \uD83D\uDCF2</p>' +
-        "</div>",
-      confirmButtonText:
-        '<i class="fab fa-whatsapp"></i> Buka WhatsApp Sekarang',
-      confirmButtonColor: "#25D366",
-      showCancelButton: false,
-      allowOutsideClick: false,
-    });
-
-    window.open(waUrl, "_blank");
   } catch (error) {
-    console.error("Checkout error:", error);
-    Swal.close();
-
-    var total2 = 0,
-      detailPesanan2 = "";
-    cart.forEach(function (item, index) {
-      var subtotal = item.harga * item.jumlah;
-      total2 += subtotal;
-      detailPesanan2 +=
-        index +
-        1 +
-        ". " +
-        item.menu +
-        " x" +
-        item.jumlah +
-        " = Rp " +
-        subtotal.toLocaleString("id-ID") +
-        "\n";
-    });
-
-    var waMsg2 = 'Halo Admin Kantin FEB! \uD83C\uDF7D\uFE0F\u2728\n\n' +
-             '*PESANAN BARU*\n' +
-             '\uD83D\uDC64 *Nama:* ' + (nama || '-') + '\n\n' +
-             '*Detail Pesanan:*\n' + detailPesanan2 + '\n' +
-             '━━━━━━━━━━━━━━━━\n' +
-             '\uD83D\uDCB0 *TOTAL: Rp ' + total2.toLocaleString('id-ID') + '*\n\n' +
-             'Mohon segera diproses ya, terima kasih! \uD83D\uDE4F';
-
-    var result2 = await Swal.fire({
-      icon: "warning",
-      title: "\u26A0\uFE0F Kendala Koneksi",
-      html: '<p style="color:#4b5563;">Terjadi kendala saat menyimpan ke database, tapi pesananmu tetap bisa dikirim langsung via WhatsApp.</p>',
-      confirmButtonText: '<i class="fab fa-whatsapp"></i> Tetap Kirim via WA',
-      confirmButtonColor: "#25D366",
-      showCancelButton: true,
-      cancelButtonText: "Batal",
-    });
-
-    if (result2.isConfirmed) {
-      window.open(
-        "https://wa.me/+62882005293513?text=" + encodeURIComponent(waMsg2),
-        "_blank",
-      );
-    }
-  } finally {
-    if (checkoutBtn) {
-      checkoutBtn.disabled = false;
-      checkoutBtn.innerHTML =
-        '<i class="fab fa-whatsapp text-xl"></i> Checkout via WhatsApp';
-    }
+    console.error("Gagal menyimpan ke database:", error);
   }
 }
+
+window.selesaiBelanjaDanTutup = function () {
+  cart = [];
+  saveCart();
+
+  document.getElementById("checkout-nama").value = "";
+  document.getElementById("checkout-catatan").value = "";
+
+  document.getElementById("payment-modal-checkout-view").classList.remove("hidden");
+  document.getElementById("payment-modal-success-view").classList.add("hidden");
+
+  kembaliKeToko();
+};
+
+window.kirimKonfirmasiWhatsApp = kirimKonfirmasiWhatsApp;
+window.checkout = checkout;
 
 async function muatMenuDariSpreadsheet() {
   var menuContainer = document.getElementById("menu-container");
   if (!menuContainer) return;
 
   menuContainer.innerHTML =
-    '<div class="col-span-full text-center py-10 text-slate-500 font-medium"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Memuat menu lezat Kantin FEB...</div>';
+    '<div class="col-span-full text-center py-10 text-slate-500 font-medium"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Memuat menu lezat Klik Food FEB...</div>';
 
   try {
-    var result = await fetchJsonp(API_URL);
-
-    if (result.status === "success") {
-      var listProduk = result.data;
-      menuContainer.innerHTML = "";
-
-      if (listProduk.length === 0) {
-        menuContainer.innerHTML =
-          '<div class="col-span-full text-center py-10 text-slate-400">Belum ada menu di database admin.</div>';
-        return;
-      }
-
-      listProduk.forEach(function (produk) {
-        var statusTersedia = produk.status === "tersedia";
-
-        var statusBadge = statusTersedia
-          ? '<span class="absolute top-4 right-4 bg-emerald-500 text-white text-xs font-semibold px-3 py-1 rounded-full shadow">Tersedia</span>'
-          : '<span class="absolute top-4 right-4 bg-rose-500 text-white text-xs font-semibold px-3 py-1 rounded-full shadow">Habis</span>';
-
-        var tombolPilih = statusTersedia
-          ? "<button onclick=\"tambahKeKeranjang('" +
-            escapeJS(produk.nama) +
-            "', " +
-            produk.harga +
-            ')" class="bg-unnesBlue hover:bg-blue-800 text-white font-medium text-sm px-4 py-2 rounded-xl transition flex items-center gap-2 shadow-sm"><i class="fa-solid fa-cart-plus text-xs"></i> Tambah ke Keranjang</button>'
-          : '<button disabled class="bg-slate-300 text-slate-500 font-medium text-sm px-4 py-2 rounded-xl cursor-not-allowed flex items-center gap-2 shadow-sm">Habis</button>';
-
-        var card = document.createElement("div");
-        card.className =
-          "bg-white rounded-3xl shadow-md hover:shadow-2xl overflow-hidden transition duration-300 transform hover:-translate-y-2 border border-slate-100 flex flex-col justify-between menu-card";
-        card.innerHTML =
-          '<div class="relative group overflow-hidden">' +
-          '<img src="' +
-          (produk.gambar ||
-            "https://via.placeholder.com/300x200?text=Menu+Kantin") +
-          '" alt="' +
-          escapeHTML(produk.nama) +
-          '" class="w-full h-48 object-cover group-hover:scale-110 transition duration-500" onerror="this.src=\'https://via.placeholder.com/300x200?text=Menu+Kantin\'">' +
-          statusBadge +
-          "</div>" +
-          '<div class="p-6 flex flex-col flex-grow">' +
-          '<h3 class="text-lg font-bold text-slate-800 mb-1">' +
-          escapeHTML(produk.nama) +
-          "</h3>" +
-          '<p class="text-xs text-slate-400 mb-4 flex-grow">' +
-          escapeHTML(produk.deskripsi || "") +
-          "</p>" +
-          '<div class="flex items-center justify-between mt-auto pt-2">' +
-          '<span class="text-lg font-extrabold text-orange-500">Rp ' +
-          parseInt(produk.harga).toLocaleString("id-ID") +
-          "</span>" +
-          tombolPilih +
-          "</div>" +
-          "</div>";
-        menuContainer.appendChild(card);
+    var listProduk = PRODUCTS_DB;
+    if (kategoriAktif !== "semua") {
+      listProduk = PRODUCTS_DB.filter(function (p) {
+        return p.kategori === kategoriAktif;
       });
-    } else {
-      menuContainer.innerHTML =
-        '<div class="col-span-full text-center py-10 text-red-500">\u26A0\uFE0F Gagal memuat menu: ' +
-        escapeHTML(result.message || "unknown error") +
-        "</div>";
     }
+    menuContainer.innerHTML = "";
+
+    if (listProduk.length === 0) {
+      menuContainer.innerHTML =
+        '<div class="col-span-full text-center py-10 text-slate-400">Belum ada menu yang tersedia.</div>';
+      return;
+    }
+
+    listProduk.forEach(function (produk) {
+      var statusTersedia = produk.stok > 0;
+
+      var statusBadge = statusTersedia
+        ? '<span class="absolute top-4 right-4 bg-emerald-500 text-white text-xs font-semibold px-3 py-1 rounded-full shadow">Stok: ' + produk.stok + '</span>'
+        : '<span class="absolute top-4 right-4 bg-rose-500 text-white text-xs font-semibold px-3 py-1 rounded-full shadow">Habis</span>';
+
+      var tombolPilih = statusTersedia
+        ? "<button onclick=\"tambahKeKeranjang('" +
+          escapeJS(produk.nama) +
+          "', " +
+          produk.harga +
+          ')" class="bg-unnesBlue hover:bg-blue-800 text-white font-medium text-sm px-4 py-2 rounded-xl transition flex items-center gap-2 shadow-sm"><i class="fa-solid fa-cart-plus text-xs"></i> Tambah ke Keranjang</button>'
+        : '<button disabled class="bg-slate-300 text-slate-500 font-medium text-sm px-4 py-2 rounded-xl cursor-not-allowed flex items-center gap-2 shadow-sm">Habis</button>';
+
+      var card = document.createElement("div");
+      card.className =
+        "bg-white rounded-3xl shadow-md hover:shadow-2xl overflow-hidden transition duration-300 transform hover:-translate-y-2 border border-slate-100 flex flex-col justify-between menu-card";
+      card.innerHTML =
+        '<div class="relative group overflow-hidden">' +
+        '<img src="' +
+        (produk.gambar ||
+          "https://via.placeholder.com/300x200?text=Klik+Food+FEB") +
+        '" alt="' +
+        escapeHTML(produk.nama) +
+        '" class="w-full h-48 object-cover group-hover:scale-110 transition duration-500" onerror="this.src=\'https://via.placeholder.com/300x200?text=Klik+Food+FEB\'">' +
+        statusBadge +
+        "</div>" +
+        '<div class="p-6 flex flex-col flex-grow">' +
+        '<h3 class="text-lg font-bold text-slate-800 mb-1">' +
+        escapeHTML(produk.nama) +
+        "</h3>" +
+        '<p class="text-xs text-slate-400 mb-4 flex-grow">' +
+        escapeHTML(produk.deskripsi || "") +
+        "</p>" +
+        '<div class="flex items-center justify-between mt-auto pt-2">' +
+        '<span class="text-lg font-extrabold text-orange-500">Rp ' +
+        parseInt(produk.harga).toLocaleString("id-ID") +
+        "</span>" +
+        tombolPilih +
+        "</div>" +
+        "</div>";
+      menuContainer.appendChild(card);
+    });
   } catch (error) {
     console.error("Gagal memuat menu:", error);
     menuContainer.innerHTML =
       '<div class="col-span-full text-center py-10 text-rose-500 font-medium">' +
-      '<i class="fas fa-circle-exclamation mr-2"></i>\u26A0\uFE0F Gagal memuat menu dari cloud server.<br>' +
+      '<i class="fas fa-circle-exclamation mr-2"></i>⚠️ Gagal memuat menu.<br>' +
       '<span class="text-xs text-slate-400 mt-2 block">' +
       escapeHTML(error.message) +
       "</span>" +
